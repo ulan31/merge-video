@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Мой локальный сервер</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    video {
+      width: 300px;
+      height: 300px;
+      border-radius: 300px;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+<video loop autoplay muted width="640" height="360">
+  <source type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+<div style="margin-left: 20px;">
+  <input type="text" id="textInput" placeholder="Введите сообщение">
+  <button onclick="sendMessage()">Отправить</button>
+</div>
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+  const socket = io('http://localhost:3000/');
+
+  function sendMessage($event) {
+    const message = document.getElementById('textInput').value;
+    // Отправить сообщение на сервер
+    socket.emit('sendMessage', message);
+    // Очистить поле ввода
+    document.getElementById('textInput').value = '';
+  }
+  // Обработчик события при получении сообщения от сервера
+  socket.on('receivedMessage', (data) => {
+    console.log('Получено сообщение от сервера:', data);
+    if (data.newVideoFileName) {
+      const videoElement = document.querySelector('video');
+      videoElement.src = `/${data.newVideoFileName}`;
+      videoElement.load();
+    }
+    // Добавьте здесь ваш код для обработки полученного сообщения
+  });
+
+</script>
+</body>
+</html>
